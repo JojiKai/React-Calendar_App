@@ -1,0 +1,12 @@
+.calendar-app {
+  width: 60%;
+  min-width: 90vmin;
+  aspect-ratio: 3/ 2;
+  background-color: #1e242d;
+  padding: 3rem;
+  border-radius: 3rem; /* 圓角 */
+  /*  */
+  border: 1rem solid #0f1319;
+  display: flex;
+  column-gap: 5rem;
+}
