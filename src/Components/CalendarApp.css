@@ -17,6 +17,8 @@
 }
 
 /* 陰影 */
+/* 在 .calendar-app 元素裡 最後面 加上一個隱形的子元素，
+可以用 content 來決定要放什麼（文字、符號、甚至空字串只拿來加裝飾） */
 .calendar-app::after {
   content: "";
   position: absolute; /* absolute 子元素會「往上找」最近的 非 static 父元素 */
@@ -101,9 +103,11 @@
 
 .days span {
   font-size: clamp(1rem, 1cqi, 1.6rem); /* clamp(最小值, 首選值, 最大值) */
-  width: calc(100% / 7); /* calc() : 允許在 CSS 中做 數學運算。 */
+  width: calc(100% / 7);
+  /* calc() : 允許在 CSS 中做 數學運算。 */
   /* 把父容器的寬度（100%）平均 分成 7 份。
   也就是每個元素的寬度 = 1/7 父容器寬度。 */
+
   aspect-ratio: 1; /* 設定元素的 寬高比 (width / height) */
   display: flex;
   justify-content: center;
@@ -139,7 +143,7 @@
   left: 3rem;
   background-color: #161b22;
   width: clamp(25rem, 21cqi, 40rem);
-  aspect-ratio: 10/9;
+  aspect-ratio: 10/9; /* 設定元素的 寬高比 (width / height) */
   border-radius: 1rem;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.3);
   display: flex;
@@ -167,9 +171,14 @@
   letter-spacing: 0.1rem;
 }
 
-.time-input input[type="number"]::-webkit-outer-spin-button,
+/* WebKit 是瀏覽器專用的偽元素，像 Chrome、Safari、Edge 都屬於 WebKit/Chromium 引擎 */
+.time-input input[type="number"]::-webkit-outer-spin-button, /* 找到 class 為 .time-input 裡的 數字輸入框 */
 .time-input input[type="number"]::-webkit-inner-spin-button {
-  appearance: none;
+  /*
+::-webkit-inner-spin-button = 數字輸入框裡的「上下箭頭」。
+::-webkit-outer-spin-button = 外圍包住箭頭的控制區域。
+*/
+  appearance: none; /* 消除原生外觀  */
 }
 
 .event-popup textarea {
@@ -182,17 +191,21 @@
   border-radius: 0.5rem;
   color: #78879e;
   transition: border 0.5s;
+  /* 指定「哪些屬性」要做動畫，以及動畫怎麼跑(持續時間) */
 }
 
+/* :focus: 被使用者「聚焦」(focus) 時，套用指定的樣式 */
 .event-popup textarea:focus {
   border: 0.1rem solid #00a3ff;
 }
 
+/* 選中 placeholder 屬性文字 */
 .event-popup textarea::placeholder {
   font-size: clamp(1rem, 0.8cqi, 1.2rem);
   color: #78879e;
 }
 
+/* 當 <textarea> 被點選（focus）時，針對 placeholder 生效 */
 .event-popup textarea:focus::placeholder {
   color: transparent;
 }
@@ -210,6 +223,7 @@
   cursor: pointer;
 }
 
+/* :active 主要是做「按下瞬間的視覺回饋」 */
 .event-popup-btn:active {
   transform: translateY(0.2rem);
 }
