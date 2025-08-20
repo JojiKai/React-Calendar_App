@@ -41,7 +41,7 @@ const CalendarApp = () => {
         </div>
 
         {/*
-         在 JavaScript 裡，.map() 的 callback 會帶三個參數：
+        在 JavaScript 裡，.map() 的 callback 會帶三個參數：
         array.map((value, index, array) => { ... })
         value 👉 陣列當前元素的值
         index 👉 當前元素的索引（0,1,2...）
