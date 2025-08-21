@@ -18,14 +18,28 @@ const CalendarApp = () => {
   ];
   const currentDate = new Date();
 
+  /*
+  Date相關meyhods:
+  const now = new Date();
+  now.getFullYear();  // 年份，例如 2025
+  now.getMonth();     // 月份 (0-11，0=一月，所以要+1才是正常月份)
+  now.getDate();      // 日期 (1-31)
+  now.getDay();       // 星期幾 (0-6，0=星期日)
+  now.getHours();     // 小時 (0-23)
+  now.getMinutes();   // 分鐘 (0-59)
+  now.getSeconds();   // 秒 (0-59)
+  now.getMilliseconds(); // 毫秒 (0-999)
+  */
+
+  // React 的 Hook，const [狀態值, 修改狀態的方法] = useState(初始值);
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
 
+  // 計算當前月份的天數
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 算出某年某月有幾天，0=「前一個月的最後一天」，再用 .getDate() 取出那一天的日期數字
 
+  // 計算當前月份的第一天是星期幾
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-
-  console.log(firstDayOfMonth);
 
   return (
     <div className="calendar-app">
@@ -54,9 +68,14 @@ const CalendarApp = () => {
           ))}
         </div>
         <div className="days">
+          {/*
+            // 建立一個長度 = firstDayOfMonth 的陣列  .keys() 產生索引 [0,1,2,...]
+            // .map() 依索引產生空白 <span>  用來在日曆前補空格，讓1號對齊正確星期
+          */}
           {[...Array(firstDayOfMonth).keys()].map((_, index) => (
             <span key={`empty-${index}`} />
           ))}
+          {/* 產生 1 號到當月最後一天的 <span></span> */}
           {[...Array(daysInMonth).keys()].map((day) => (
             <span key={day + 1}>{day + 1}</span>
           ))}
