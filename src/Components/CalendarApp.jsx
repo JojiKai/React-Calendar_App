@@ -34,6 +34,8 @@ const CalendarApp = () => {
   // React 的 Hook，const [狀態值, 修改狀態的方法] = useState(初始值);
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
+  const [selectedDay, setSelectedDay] = useState(currentDate);
+  const [showEventPopup, setShowEventPopup] = useState(false);
 
   // 計算當前月份的天數
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 算出某年某月有幾天，0=「前一個月的最後一天」，再用 .getDate() 取出那一天的日期數字
@@ -41,6 +43,7 @@ const CalendarApp = () => {
   // 計算當前月份的第一天是星期幾
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
+  // 切換上一個月份
   const prevMonth = () => {
     setCurrentMonth((prevMonth) => (prevMonth === 0 ? 11 : prevMonth - 1));
     setCurrentYear((prevYear) =>
@@ -48,10 +51,31 @@ const CalendarApp = () => {
     );
   };
 
+  // 切換下一個月份
   const nextMonth = () => {
     setCurrentMonth((prevMonth) => (prevMonth === 11 ? 0 : prevMonth + 1));
     setCurrentYear((prevYear) =>
       currentMonth === 11 ? prevYear + 1 : prevYear
+    );
+  };
+
+  const handleDateClick = (day) => {
+    const clickDate = new Date(currentYear, currentMonth, day);
+    console.log(clickDate);
+    const today = new Date();
+    console.log(today);
+    // 如果點擊的日期大於或等於今天，則選擇該日期並顯示事件彈窗
+    if (clickDate >= today || isSameDay(clickDate, today)) {
+      setSelectedDay(clickDate);
+      setShowEventPopup(true);
+    }
+  };
+
+  const isSameDay = (data1, data2) => {
+    return (
+      data1.getDate() === data2.getDate() &&
+      data1.getMonth() === data2.getMonth() &&
+      data1.getFullYear() === data2.getFullYear()
     );
   };
 
@@ -93,6 +117,9 @@ const CalendarApp = () => {
           {[...Array(daysInMonth).keys()].map((day) => (
             <span
               key={day + 1}
+              // day + 1 === currentDate.getDate()        // 今天是幾號
+              // currentMonth === currentDate.getMonth()  // 當前顯示的月是否等於今天的月
+              // currentYear === currentDate.getFullYear() // 當前顯示的年是否等於今天的年
               className={
                 day + 1 === currentDate.getDate() &&
                 currentMonth === currentDate.getMonth() &&
@@ -100,6 +127,7 @@ const CalendarApp = () => {
                   ? "current-day"
                   : ""
               }
+              onClick={() => handleDateClick(day + 1)}
             >
               {day + 1}
             </span>
@@ -107,30 +135,36 @@ const CalendarApp = () => {
         </div>
       </div>
       <div className="events">
-        <div className="event-popup">
-          <div className="time-input">
-            <div className="event-popup-time">Time</div>
-            <input
-              type="number"
-              name="hours"
-              min={0}
-              max={24}
-              className="hours"
-            />
-            <input
-              type="number"
-              name="minutes"
-              min={0}
-              max={60}
-              className="minutes"
-            />
+        {showEventPopup && (
+          <div className="event-popup">
+            <div className="time-input">
+              <div className="event-popup-time">Time</div>
+              <input
+                type="number"
+                name="hours"
+                min={0}
+                max={24}
+                className="hours"
+              />
+              <input
+                type="number"
+                name="minutes"
+                min={0}
+                max={60}
+                className="minutes"
+              />
+            </div>
+            <textarea placeholder="Enter Event Text(Maximum 60 Characters)"></textarea>
+            <button className="event-popup-btn">Add Event</button>
+            <button
+              className="close-event-popup"
+              onClick={() => setShowEventPopup(false)}
+            >
+              <i className="bx bx-x"></i>
+            </button>
           </div>
-          <textarea placeholder="Enter Event Text(Maximum 60 Characters)"></textarea>
-          <button className="event-popup-btn">Add Event</button>
-          <button className="close-event-popup">
-            <i className="bx bx-x"></i>
-          </button>
-        </div>
+        )}
+
         <div className="event">
           <div className="event-date-wrapper">
             <div className="event-date">May 15,2024</div>
