@@ -32,22 +32,23 @@ const CalendarApp = () => {
   */
 
   // React 的 Hook，const [狀態值, 修改狀態的方法] = useState(初始值);
-  const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
-  const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
-  const [selectedDay, setSelectedDay] = useState(currentDate);
-  const [showEventPopup, setShowEventPopup] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth()); //  取得月份(0-11，0=一月)
+  const [currentYear, setCurrentYear] = useState(currentDate.getFullYear()); // 取得四位數的年份
+  const [selectedDay, setSelectedDay] = useState(currentDate); // 預設選擇今天
+  const [showEventPopup, setShowEventPopup] = useState(false); // 控制事件彈窗顯示與否
   const [events, setEvents] = useState([]); // 儲存事件的陣列
-  const [eventTime, setEventTime] = useState({ hours: "00", minutes: "00" });
-  const [eventText, setEventText] = useState("");
+  const [eventTime, setEventTime] = useState({ hours: "00", minutes: "00" }); // 儲存事件時間的物件
+  const [eventText, setEventText] = useState(""); // 儲存事件文字的字串
 
   // 計算當前月份的天數
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 算出某年某月有幾天，0=「前一個月的最後一天」，再用 .getDate() 取出那一天的日期數字
 
-  // 計算當前月份的第一天是星期幾
+  // 計算當前月份的第一天是星期幾，0=星期日，1=星期一，依此類推
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
   // 切換上一個月份
   const prevMonth = () => {
+    // 如果當前月份是1月(0)，則切換到12月(11)，並且年份減1
     setCurrentMonth((prevMonth) => (prevMonth === 0 ? 11 : prevMonth - 1));
     setCurrentYear((prevYear) =>
       currentMonth === 0 ? prevYear - 1 : prevYear
@@ -56,23 +57,23 @@ const CalendarApp = () => {
 
   // 切換下一個月份
   const nextMonth = () => {
+    // 如果當前月份是12月(11)，則切換到1月(0)，並且年份加1
     setCurrentMonth((prevMonth) => (prevMonth === 11 ? 0 : prevMonth + 1));
     setCurrentYear((prevYear) =>
       currentMonth === 11 ? prevYear + 1 : prevYear
     );
   };
 
+  // 點擊日期的處理函式
   const handleDateClick = (day) => {
     const clickDate = new Date(currentYear, currentMonth, day);
-    console.log(clickDate);
     const today = new Date();
-    console.log(today);
     // 如果點擊的日期大於或等於今天，則選擇該日期並顯示事件彈窗
     if (clickDate >= today || isSameDay(clickDate, today)) {
       setSelectedDay(clickDate);
-      setShowEventPopup(true);
-      setEventTime({ hours: "00", minutes: "00" });
-      setEventText("");
+      setShowEventPopup(true); // 顯示事件彈窗
+      setEventTime({ hours: "00", minutes: "00" }); // 重設時間(歸零)
+      setEventText(""); // 重設事件文字(清空)
     }
   };
 
@@ -87,6 +88,7 @@ const CalendarApp = () => {
   const handleEventSubmit = () => {
     const newEvent = {
       date: selectedDay,
+      // padStart(2, "0") 用來補足兩位數，不足的話在前面補0
       time: `${eventTime.hours.padStart(2, "0")}:${eventTime.minutes.padStart(
         2,
         "0"
@@ -94,10 +96,10 @@ const CalendarApp = () => {
       text: eventText,
     };
 
-    setEvents([...events, newEvent]);
-    setEventTime({ hours: "00", minutes: "00" });
-    setEventText("");
-    setShowEventPopup(false);
+    setEvents([...events, newEvent]); // 使用展開運算子(...)來新增事件到陣列
+    setEventTime({ hours: "00", minutes: "00" }); // 重設時間(歸零)
+    setEventText(""); // 重設事件文字(清空)
+    setShowEventPopup(false); // 隱藏事件彈窗
   };
 
   return (
@@ -132,6 +134,7 @@ const CalendarApp = () => {
             // .map() 依索引產生空白 <span>  用來在日曆前補空格，讓1號對齊正確星期
           */}
           {[...Array(firstDayOfMonth).keys()].map((_, index) => (
+            // ...展開運算子（spread） 把迭代器產生的值「攤平」成真正的陣列
             <span key={`empty-${index}`} />
           ))}
           {/* 產生 1 號到當月最後一天的 <span></span> */}
@@ -148,7 +151,7 @@ const CalendarApp = () => {
                   ? "current-day"
                   : ""
               }
-              onClick={() => handleDateClick(day + 1)}
+              onClick={() => handleDateClick(day + 1)} // day 從 0 開始，所以要 +1
             >
               {day + 1}
             </span>
@@ -167,8 +170,9 @@ const CalendarApp = () => {
                 max={24}
                 className="hours"
                 value={eventTime.hours}
-                onChange={(e) =>
-                  setEventTime({ ...eventTime, hours: e.target.value })
+                onChange={
+                  (e) => setEventTime({ ...eventTime, hours: e.target.value })
+                  // ...eventTime 先保留原本的其他屬性（如 minutes），再覆蓋你要改的那個值。
                 }
               />
               <input
