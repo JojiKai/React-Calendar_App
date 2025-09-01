@@ -36,6 +36,9 @@ const CalendarApp = () => {
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [selectedDay, setSelectedDay] = useState(currentDate);
   const [showEventPopup, setShowEventPopup] = useState(false);
+  const [events, setEvents] = useState([]); // 儲存事件的陣列
+  const [eventTime, setEventTime] = useState({ hours: "00", minutes: "00" });
+  const [eventText, setEventText] = useState("");
 
   // 計算當前月份的天數
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 算出某年某月有幾天，0=「前一個月的最後一天」，再用 .getDate() 取出那一天的日期數字
@@ -68,6 +71,8 @@ const CalendarApp = () => {
     if (clickDate >= today || isSameDay(clickDate, today)) {
       setSelectedDay(clickDate);
       setShowEventPopup(true);
+      setEventTime({ hours: "00", minutes: "00" });
+      setEventText("");
     }
   };
 
@@ -77,6 +82,22 @@ const CalendarApp = () => {
       data1.getMonth() === data2.getMonth() &&
       data1.getFullYear() === data2.getFullYear()
     );
+  };
+
+  const handleEventSubmit = () => {
+    const newEvent = {
+      date: selectedDay,
+      time: `${eventTime.hours.padStart(2, "0")}:${eventTime.minutes.padStart(
+        2,
+        "0"
+      )}`,
+      text: eventText,
+    };
+
+    setEvents([...events, newEvent]);
+    setEventTime({ hours: "00", minutes: "00" });
+    setEventText("");
+    setShowEventPopup(false);
   };
 
   return (
@@ -145,6 +166,10 @@ const CalendarApp = () => {
                 min={0}
                 max={24}
                 className="hours"
+                value={eventTime.hours}
+                onChange={(e) =>
+                  setEventTime({ ...eventTime, hours: e.target.value })
+                }
               />
               <input
                 type="number"
@@ -152,10 +177,22 @@ const CalendarApp = () => {
                 min={0}
                 max={60}
                 className="minutes"
+                value={eventTime.minutes}
+                onChange={(e) =>
+                  setEventTime({ ...eventTime, minutes: e.target.value })
+                }
               />
             </div>
-            <textarea placeholder="Enter Event Text(Maximum 60 Characters)"></textarea>
-            <button className="event-popup-btn">Add Event</button>
+            <textarea
+              placeholder="Enter Event Text(Maximum 60 Characters)"
+              value={eventText}
+              onChange={(e) => {
+                if (e.target.value.length <= 60) setEventText(e.target.value);
+              }}
+            ></textarea>
+            <button className="event-popup-btn" onClick={handleEventSubmit}>
+              Add Event
+            </button>
             <button
               className="close-event-popup"
               onClick={() => setShowEventPopup(false)}
@@ -164,18 +201,21 @@ const CalendarApp = () => {
             </button>
           </div>
         )}
-
-        <div className="event">
-          <div className="event-date-wrapper">
-            <div className="event-date">May 15,2024</div>
-            <div className="event-time">10:00</div>
+        {events.map((event, index) => (
+          <div className="event" key={index}>
+            <div className="event-date-wrapper">
+              <div className="event-date">{`${
+                monthOfYear[event.date.getMonth()]
+              } ${event.date.getDate()}, ${event.date.getFullYear()}`}</div>
+              <div className="event-time">{event.time}</div>
+            </div>
+            <div className="event-text">{event.text}</div>
+            <div className="event-buttons">
+              <i className="bx bxs-edit-alt"></i>
+              <i className="bx bx-message-x"></i>
+            </div>
           </div>
-          <div className="event-text">Meeeting with John</div>
-          <div className="event-buttons">
-            <i className="bx bxs-edit-alt"></i>
-            <i className="bx  bx-message-x"></i>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
