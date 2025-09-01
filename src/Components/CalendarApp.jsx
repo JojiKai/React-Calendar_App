@@ -39,6 +39,7 @@ const CalendarApp = () => {
   const [events, setEvents] = useState([]); // 儲存事件的陣列
   const [eventTime, setEventTime] = useState({ hours: "00", minutes: "00" }); // 儲存事件時間的物件
   const [eventText, setEventText] = useState(""); // 儲存事件文字的字串
+  const [editingEvent, setEditingEvent] = useState(null); // 儲存正在編輯的事件索引
 
   // 計算當前月份的天數
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // 算出某年某月有幾天，0=「前一個月的最後一天」，再用 .getDate() 取出那一天的日期數字
@@ -74,6 +75,7 @@ const CalendarApp = () => {
       setShowEventPopup(true); // 顯示事件彈窗
       setEventTime({ hours: "00", minutes: "00" }); // 重設時間(歸零)
       setEventText(""); // 重設事件文字(清空)
+      setEditing(null); // 重設正在編輯的事件索引
     }
   };
 
@@ -86,7 +88,9 @@ const CalendarApp = () => {
   };
 
   const handleEventSubmit = () => {
+    // 建立一個新的事件物件
     const newEvent = {
+      id: editingEvent ? editingEvent.id : Date.now(), // 如果是編輯事件，保留原本的id，否則用當前時間戳作為id
       date: selectedDay,
       // padStart(2, "0") 用來補足兩位數，不足的話在前面補0
       time: `${eventTime.hours.padStart(2, "0")}:${eventTime.minutes.padStart(
@@ -96,10 +100,39 @@ const CalendarApp = () => {
       text: eventText,
     };
 
-    setEvents([...events, newEvent]); // 使用展開運算子(...)來新增事件到陣列
+    // 建立一個新的事件陣列，把目前所有事件（events 陣列）複製一份，存到 updatedEvents
+    let updatedEvents = [...events];
+
+    // 如果正在編輯事件，則更新該事件
+    if (editingEvent) {
+      updatedEvents = updatedEvents.map((event) =>
+        event.id === editingEvent.id ? newEvent : event
+      );
+    } else {
+      updatedEvents.push(newEvent);
+    }
+
+    // 根據日期和時間排序事件 （先比日期，再比時間）
+    updatedEvents.sort((a, b) => {
+      new Date(a.date) - new Date(b.date) || a.time.localeCompare(b.time);
+    });
+
+    setEvents(updatedEvents); // 更新事件陣列
     setEventTime({ hours: "00", minutes: "00" }); // 重設時間(歸零)
     setEventText(""); // 重設事件文字(清空)
     setShowEventPopup(false); // 隱藏事件彈窗
+    setEditingEvent(null); // 重設正在編輯的事件索引
+  };
+
+  const handleEditEvent = (event) => {
+    setSelectedDay(new Date(event.date));
+    setEventTime({
+      hours: event.time.split(":")[0],
+      minutes: event.time.split(":")[1],
+    });
+    setEventText(event.text);
+    setEditingEvent(event);
+    setShowEventPopup(true);
   };
 
   return (
@@ -195,7 +228,8 @@ const CalendarApp = () => {
               }}
             ></textarea>
             <button className="event-popup-btn" onClick={handleEventSubmit}>
-              Add Event
+              {editingEvent ? "Update Event" : "Add Event"}
+              {/* 如果有正在編輯的事件，就顯示 "Update Event"，否則顯示 "Add Event" */}
             </button>
             <button
               className="close-event-popup"
@@ -215,7 +249,10 @@ const CalendarApp = () => {
             </div>
             <div className="event-text">{event.text}</div>
             <div className="event-buttons">
-              <i className="bx bxs-edit-alt"></i>
+              <i
+                className="bx bxs-edit-alt"
+                onClick={() => handleEditEvent(event)}
+              ></i>
               <i className="bx bx-message-x"></i>
             </div>
           </div>
