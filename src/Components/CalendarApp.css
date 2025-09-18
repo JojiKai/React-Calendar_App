@@ -135,6 +135,11 @@
   width: 60%;
   height: 100%;
   padding: 3rem 0;
+  overflow-y: auto; /* 當內容超出容器高度時，顯示垂直滾動條 */
+}
+
+.events::-webkit-scrollbar {
+  display: none;
 }
 
 .event-popup {

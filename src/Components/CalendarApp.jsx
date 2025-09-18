@@ -108,14 +108,16 @@ const CalendarApp = () => {
       updatedEvents = updatedEvents.map((event) =>
         event.id === editingEvent.id ? newEvent : event
       );
-    } else {
+    } // 否則，新增事件到陣列
+    else {
       updatedEvents.push(newEvent);
     }
 
     // 根據日期和時間排序事件 （先比日期，再比時間）
-    updatedEvents.sort((a, b) => {
-      new Date(a.date) - new Date(b.date) || a.time.localeCompare(b.time);
-    });
+    updatedEvents.sort(
+      (a, b) =>
+        new Date(a.date) - new Date(b.date) || a.time.localeCompare(b.time)
+    );
 
     setEvents(updatedEvents); // 更新事件陣列
     setEventTime({ hours: "00", minutes: "00" }); // 重設時間(歸零)
@@ -133,6 +135,21 @@ const CalendarApp = () => {
     setEventText(event.text);
     setEditingEvent(event);
     setShowEventPopup(true);
+  };
+
+  // ChatGPT 9/18
+  const handleDeleteEvent = (eventId) => {
+    const updatedEvents = events.filter((event) => event.id !== eventId);
+    setEvents(updatedEvents);
+  };
+
+  const handleTimeChange = (e) => {
+    const { name, value } = e.target;
+
+    setEventTime((prevTime) => ({
+      ...prevTime,
+      [name]: value.padStart(2, "0"),
+    }));
   };
 
   return (
@@ -203,10 +220,7 @@ const CalendarApp = () => {
                 max={24}
                 className="hours"
                 value={eventTime.hours}
-                onChange={
-                  (e) => setEventTime({ ...eventTime, hours: e.target.value })
-                  // ...eventTime 先保留原本的其他屬性（如 minutes），再覆蓋你要改的那個值。
-                }
+                onChange={handleTimeChange}
               />
               <input
                 type="number"
@@ -215,9 +229,7 @@ const CalendarApp = () => {
                 max={60}
                 className="minutes"
                 value={eventTime.minutes}
-                onChange={(e) =>
-                  setEventTime({ ...eventTime, minutes: e.target.value })
-                }
+                onChange={handleTimeChange}
               />
             </div>
             <textarea
@@ -253,7 +265,10 @@ const CalendarApp = () => {
                 className="bx bxs-edit-alt"
                 onClick={() => handleEditEvent(event)}
               ></i>
-              <i className="bx bx-message-x"></i>
+              <i
+                className="bx bx-message-x"
+                onClick={() => handleDeleteEvent(event.id)}
+              ></i>
             </div>
           </div>
         ))}
